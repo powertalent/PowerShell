@@ -1,0 +1,14 @@
+# Set your search directory and destination directory
+$searchdir = "C:\searchDir"
+$destdir = "D:\destDir"
+
+# Create array from your list of filenames
+$filenameslist = Get-Content fileNamesList.txt
+
+# For each file in array of filenames get fullpath and copy file
+foreach ($file in $filenameslist) {
+     # Find and get full path of file
+     $fullname = Get-ChildItem -Recurse $searchdir | Where-Object -Property Name -EQ -Value $file | ForEach-Object FullName
+     # Copy file to destination directory
+     Copy-Item $fullname $destdir
+}
