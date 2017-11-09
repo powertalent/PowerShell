@@ -1,0 +1,23 @@
+# Set your search directory list and search keyword list
+$searchDirList  = Get-Content "folderlist.txt"
+$searchKeyWords = Get-Content "keywords.txt"
+
+echo $null > "keywordsnotused.txt"
+
+foreach ($keyword in $searchKeyWords){
+    # Set notFound Flag is false
+    $notFound = $false;
+    foreach($folder in $searchDirList){        
+        $found = Get-ChildItem -Recurse $folder | Select-String -Pattern $keyword
+        # If Found Keyword then Break
+        if ($found -ne $null -and $found -ne ""){
+            $notFound = $true;
+            break;
+        }
+    }
+    # If not Found keyword then Print 
+    if (-not $notFound){
+        Write-Host $keyword "not used."
+        echo $keyword >> "keywordsnotused.txt"
+    }
+}
