@@ -1,15 +1,22 @@
 # https://superuser.com/questions/920344/windows-7-how-to-locate-a-list-of-files-by-filename-and-copy-them-into-a-folde
 # Set your search directory and destination directory
-$searchdir = "C:\searchDir"
-$destdir = "D:\destDir"
+$searchdir = "C:\source\"
+$destdir = "C:\dest\"
 
 # Create array from your list of filenames
-$filenameslist = Get-Content fileNamesList.txt
-
-# For each file in array of filenames get fullpath and copy file
-foreach ($file in $filenameslist) {
+$filenames = Get-Content filenames.txt
+echo $null > fullfilenames.txt
+# For each file in array of filenames get fullpath and assign var $fullname
+foreach ($file in $filenames) {
      # Find and get full path of file
      $fullname = Get-ChildItem -Recurse $searchdir | Where-Object -Property Name -EQ -Value $file | ForEach-Object FullName
-     # Copy file to destination directory
-     Copy-Item $fullname $destdir
+     if ($fullname -ne $null -and $fullname -ne ""){
+        # Add full path of file to fullfilenames.txt
+        echo $fullname >> fullfilenames.txt
+        # Copy file to destination directory
+        Copy-Item $fullname $destdir
+     }  else {
+        # Add FileName if Find Not Found
+        echo $file >> fullfilenames.txt
+     }   
 }
