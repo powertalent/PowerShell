@@ -1,0 +1,53 @@
+# Power Talent
+# Rename file with Regex
+
+# Scan folder get file name
+# {!$_.PSisContainer } => Exclude folders in Get-ChildItem
+$filenameList = Get-ChildItem -Recurse | where { !$_.PSisContainer } | ForEach-Object FullName
+# 
+foreach ($fileNameFull in $filenameList) {
+     $fileName = Split-Path $fileNameFull -Leaf
+     
+     # Define regex of File name
+     $regex = ‘^(\w+)_(\d+)_(\w+)\.(\w+)’
+     # Match file name
+     $found = $fileName -match $regex
+     
+     if ($found) {
+        # echo $fileName
+            $group3 = $matches[3]
+            $fileNameTmp = $fileName
+
+            $tableName = ''
+
+            switch ($group3) 
+            { 
+                "TB1" { $tableName = 'TableOne' } 
+                "TB2" { $tableName = 'TableTwo' } 
+                default {"Not match..."}
+            }
+            
+            # Test Begin               
+               #$path = Split-Path -Path $fileName -Parent
+               #$currentPath = (Get-Location).path
+      
+               $parentPath = Split-Path -Path $fileNameFull -Parent
+               $parentFolderName = Split-Path (Split-Path -Path $fileNameFull -Parent) -Leaf
+               $grandFatherPath = Split-Path -Path $parentPath -Parent
+               $grandFatherFolderName = Split-Path (Split-Path -Path $parentPath -Parent) -Leaf
+               #echo $grandFatherFolderName 
+               #echo (get-item $file ).parent.parent
+            # Test End
+
+            # Create regex to replace
+            $regexReplace = '$1_$2_' +$grandFatherFolderName+'_'+$parentFolderName+'_'+ $tableName + '_$3.$4'
+            
+            $fileNameTmp = $fileNameTmp -replace $regex, $regexReplace
+
+            # echo $fileNameTmp
+            if ($fileNameTmp -ne $fileName){
+                echo $fileNameTmp
+                # Rename-Item $fileName $fileNameTmp
+            }    
+        }     
+}
